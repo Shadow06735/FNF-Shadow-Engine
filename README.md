@@ -1,4 +1,4 @@
-# Friday Night Funkin': Kade Engine
+# Friday Night Funkin': Shadow Engine
 An engine that combines the aspects of Psych and Kade together. Made because I was bored and had nothing else to do lol.
 
 ## Installation:
