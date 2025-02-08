@@ -34,7 +34,10 @@ same goes for *Lua Scripts*, comment out or delete the line with `LUA_ALLOWED`, 
 * superpowers04 - LUA JIT Fork
 _____________________________________
 
-# New Features
+# Features
+* Star Scoring System
+![](https://github.com/user-attachments/assets/62cd37f6-3ab6-4fea-8aec-89bd42319a0a)
+
 * Millisecond counter from Kade
 * Modified health system
 * New visual option
