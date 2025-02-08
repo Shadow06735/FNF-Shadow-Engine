@@ -36,6 +36,7 @@ _____________________________________
 
 # Features
 * Star Scoring System
+
 ![](https://github.com/user-attachments/assets/62cd37f6-3ab6-4fea-8aec-89bd42319a0a)
 
 * Millisecond counter from Kade
