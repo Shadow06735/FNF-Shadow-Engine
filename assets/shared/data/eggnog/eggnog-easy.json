@@ -683,11 +683,16 @@
 			"mustHitSection": true
 		}
 	],
-	"gfVersion": null,
+	"gfVersion": "gf-christmas",
 	"events": [],
+	"shitsGain": 0.31,
+	"sicksGain": 1.3,
 	"song": "Eggnog",
+	"goodsGain": 0.97,
+	"badsGain": 0.64,
 	"needsVoices": true,
-	"format": "psych_v1_convert",
+	"stage": "mall",
+	"format": "shadowEngine_convert",
 	"speed": 1.4,
 	"bpm": 150
 }

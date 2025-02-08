@@ -374,7 +374,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 		infoBox.getTab('Information').menu.add(infoText);
 		add(infoBox);
 
-		mainBox = new PsychUIBox(mainBoxPosition.x, mainBoxPosition.y, 300, 280, ['Charting', 'Data', 'Events', 'Note', 'Section', 'Song']);
+		mainBox = new PsychUIBox(mainBoxPosition.x, mainBoxPosition.y, 340, 280, ['Charting', 'Data', 'Star Bar', 'Events', 'Note', 'Section', 'Song']);
 		mainBox.selectedName = 'Song';
 		mainBox.scrollFactor.set();
 		mainBox.cameras = [camUI];
@@ -422,6 +422,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 		////// for main box
 		addChartingTab();
 		addDataTab();
+		addStarBarTab();
 		addEventsTab();
 		addNoteTab();
 		addSectionTab();
@@ -580,12 +581,16 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 			needsVoices: true,
 			speed: 1,
 			offset: 0,
+			shitsGain: 0.5,
+			badsGain: 1,
+			goodsGain: 1.5,
+			sicksGain: 2,
 
 			player1: 'bf',
 			player2: 'dad',
 			gfVersion: 'gf',
 			stage: 'stage',
-			format: 'psych_v1'
+			format: 'shadowEngine'
 		};
 		Song.chartPath = null;
 		loadChart(song);
@@ -614,6 +619,11 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 		// SONG TAB
 		songNameInputText.text = PlayState.SONG.song;
 		allowVocalsCheckBox.checked = (PlayState.SONG.needsVoices != false); //If the song for some reason does not have this value, it will be set to true
+
+		shitsValueStepper.value = PlayState.SONG.shitsGain;
+		badsValueStepper.value = PlayState.SONG.badsGain;
+		goodsValueStepper.value = PlayState.SONG.goodsGain;
+		sicksValueStepper.value = PlayState.SONG.sicksGain;
 
 		bpmStepper.value = PlayState.SONG.bpm;
 		scrollSpeedStepper.value = PlayState.SONG.speed;
@@ -2451,6 +2461,41 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 		tab_group.add(noteSplashesInputText);
 
 		tab_group.add(gameOverCharDropDown); //lowest priority to display properly
+	}
+
+	var shitsValueStepper:PsychUINumericStepper;
+	var badsValueStepper:PsychUINumericStepper;
+	var goodsValueStepper:PsychUINumericStepper;
+	var sicksValueStepper:PsychUINumericStepper;
+	function addStarBarTab()
+	{
+		var tab_group = mainBox.getTab('Star Bar').menu;
+		var objX = 10;
+		var objY = 25;
+
+		shitsValueStepper = new PsychUINumericStepper(objX, objY, 0.05, 0.5, 0, 10, 2, 80);
+		shitsValueStepper.onValueChange = function() PlayState.SONG.shitsGain = shitsValueStepper.value;
+
+		objY += 40;
+		badsValueStepper = new PsychUINumericStepper(objX, objY, 0.05, 1, 0, 10, 2, 80);
+		badsValueStepper.onValueChange = function() PlayState.SONG.badsGain = badsValueStepper.value;
+
+		objY += 40;
+		goodsValueStepper = new PsychUINumericStepper(objX, objY, 0.05, 1.5, 0, 10, 2, 80);
+		goodsValueStepper.onValueChange = function() PlayState.SONG.goodsGain = goodsValueStepper.value;
+
+		objY += 40;
+		sicksValueStepper = new PsychUINumericStepper(objX, objY, 0.05, 2, 0, 10, 2, 80);
+		sicksValueStepper.onValueChange = function() PlayState.SONG.sicksGain = sicksValueStepper.value;
+
+		tab_group.add(new FlxText(shitsValueStepper.x, shitsValueStepper.y - 15, 180, '"Shit" rating increase value:'));
+		tab_group.add(new FlxText(badsValueStepper.x, badsValueStepper.y - 15, 180, '"Bad" rating increase value:'));
+		tab_group.add(new FlxText(goodsValueStepper.x, goodsValueStepper.y - 15, 180, '"Good" rating increase value:'));
+		tab_group.add(new FlxText(sicksValueStepper.x, sicksValueStepper.y - 15, 180, '"Sick" rating increase value:'));
+		tab_group.add(shitsValueStepper);
+		tab_group.add(badsValueStepper);
+		tab_group.add(goodsValueStepper);
+		tab_group.add(sicksValueStepper);
 	}
 
 	var eventDropDown:PsychUIDropDownMenu;

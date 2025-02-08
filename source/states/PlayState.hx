@@ -9,6 +9,7 @@ import backend.Rating;
 import flixel.FlxBasic;
 import flixel.FlxObject;
 import flixel.FlxSubState;
+import flixel.tweens.FlxTween;
 import flixel.util.FlxSort;
 import flixel.util.FlxStringUtil;
 import flixel.util.FlxSave;
@@ -207,6 +208,7 @@ class PlayState extends MusicBeatState
 
 	public static var campaignScore:Int = 0;
 	public static var campaignMisses:Int = 0;
+	public static var campaignStars:Int = 0;
 	public static var seenCutscene:Bool = false;
 	public static var deathCounter:Int = 0;
 
@@ -222,6 +224,30 @@ class PlayState extends MusicBeatState
 	var songNameWatermark:FlxText;
 	var shadowEngineWatermark:FlxText;
 	var shadowEngineLogo:FlxSprite;
+
+	// Just Dance shit
+	public var starBarBase:FlxSprite;
+	public var starBarBG:FlxSprite;
+	public var starBar:FlxSprite;
+	public var nota:Float = 541;
+	public var star1:FlxSprite;
+	public var star2:FlxSprite;
+	public var star3:FlxSprite;
+	public var star4:FlxSprite;
+	public var star5:FlxSprite;
+	public var starSuffix:String = '';
+	public var starSoundsSuffix:String = '';
+	public var star1achieved:Bool = false;
+	public var star2achieved:Bool = false;
+	public var star3achieved:Bool = false;
+	public var star4achieved:Bool = false;
+	public var star5achieved:Bool = false;
+	public var shitsGain(default, set):Float = 1;
+	public var badsGain(default, set):Float = 1;
+	public var goodsGain(default, set):Float = 1;
+	public var sicksGain(default, set):Float = 1;
+	public var starsGained:Int = 0;
+	var scale:Float = 0;
 
 	public var boyfriendCameraOffset:Array<Float> = null;
 	public var opponentCameraOffset:Array<Float> = null;
@@ -529,6 +555,102 @@ class PlayState extends MusicBeatState
 		iconP2.alpha = ClientPrefs.data.healthBarAlpha;
 		uiGroup.add(iconP2);
 
+		// Just Dance Star Bar
+		if(isPixelStage) starSuffix = '-pixel';
+		if(isPixelStage) starSoundsSuffix = '-pixel';
+
+		starBarBase = new FlxSprite(0, healthBar.y - 100).makeGraphic(Std.int(FlxG.width * 0.1), 3, FlxColor.WHITE);
+		starBarBase.scrollFactor.set();
+		starBarBase.visible = !ClientPrefs.data.hideHud;
+		uiGroup.add(starBarBase);
+		if(ClientPrefs.data.downScroll)
+			starBarBase.y = FlxG.height - 179;
+
+		starBarBG = new FlxSprite(starBarBase.x + 77, starBarBase.y - 350).makeGraphic(Std.int(FlxG.width * 0.04), 350, FlxColor.BLACK);
+		starBarBG.alpha = 0.6;
+		starBarBG.scrollFactor.set();
+		starBarBG.visible = !ClientPrefs.data.hideHud;
+		uiGroup.add(starBarBG);
+		if(ClientPrefs.data.downScroll)
+			starBarBG.y = starBarBase.y - 350;
+
+		starBar = new FlxSprite(starBarBG.x + 3.75, starBarBase.y - 1).makeGraphic(Std.int(FlxG.width * 0.035), 1);
+		starBar.scrollFactor.set();
+		starBar.scale.y = 0;
+		starBar.visible = !ClientPrefs.data.hideHud;
+		reloadStarBarColors();
+		uiGroup.add(starBar);
+
+		star1 = new FlxSprite(starBarBG.x - 35, starBarBase.y - 88);
+		star1.frames = Paths.getSparrowAtlas('stars/star' + starSuffix);
+		star1.animation.addByPrefix('static', "static", 24);
+		star1.animation.addByPrefix('glow', "glow", 24);
+		star1.animation.play('static');
+		star1.visible = !ClientPrefs.data.hideHud;
+		if(!isPixelStage) star1.antialiasing = ClientPrefs.data.antialiasing;
+		uiGroup.add(star1);
+		if(isPixelStage) {
+			star1.scale.set(2, 2);
+			star1.x = starBarBG.x - 25;
+			star1.y = starBarBase.y - 72;
+		}
+
+		star2 = new FlxSprite(starBarBG.x - 35, starBarBase.y - 148);
+		star2.frames = Paths.getSparrowAtlas('stars/star' + starSuffix);
+		star2.animation.addByPrefix('static', "static", 24);
+		star2.animation.addByPrefix('glow', "glow", 24);
+		star2.animation.play('static');
+		star2.visible = !ClientPrefs.data.hideHud;
+		if(!isPixelStage) star2.antialiasing = ClientPrefs.data.antialiasing;
+		uiGroup.add(star2);
+		if(isPixelStage) {
+			star2.scale.set(2, 2);
+			star2.x = starBarBG.x - 25;
+			star2.y = starBarBase.y - 132;
+		}
+
+		star3 = new FlxSprite(starBarBG.x - 35, starBarBase.y - 208);
+		star3.frames = Paths.getSparrowAtlas('stars/star' + starSuffix);
+		star3.animation.addByPrefix('static', "static", 24);
+		star3.animation.addByPrefix('glow', "glow", 24);
+		star3.animation.play('static');
+		star3.visible = !ClientPrefs.data.hideHud;
+		if(!isPixelStage) star3.antialiasing = ClientPrefs.data.antialiasing;
+		uiGroup.add(star3);
+		if(isPixelStage) {
+			star3.scale.set(2, 2);
+			star3.x = starBarBG.x - 25;
+			star3.y = starBarBase.y - 192;
+		}
+
+		star4 = new FlxSprite(starBarBG.x - 35, starBarBase.y - 268);
+		star4.frames = Paths.getSparrowAtlas('stars/star' + starSuffix);
+		star4.animation.addByPrefix('static', "static", 24);
+		star4.animation.addByPrefix('glow', "glow", 24);
+		star4.animation.play('static');
+		star4.visible = !ClientPrefs.data.hideHud;
+		if(!isPixelStage) star4.antialiasing = ClientPrefs.data.antialiasing;
+		uiGroup.add(star4);
+		if(isPixelStage) {
+			star4.scale.set(2, 2);
+			star4.x = starBarBG.x - 25;
+			star4.y = starBarBase.y - 252;
+		}
+
+		star5 = new FlxSprite(starBarBG.x - 35, starBarBase.y - 328);
+		star5.frames = Paths.getSparrowAtlas('stars/star' + starSuffix);
+		star5.animation.addByPrefix('static', "static", 24);
+		star5.animation.addByPrefix('glow', "glow", 24);
+		star5.animation.play('static');
+		star5.visible = !ClientPrefs.data.hideHud;
+		if(!isPixelStage) star5.antialiasing = ClientPrefs.data.antialiasing;
+		uiGroup.add(star5);
+		if(isPixelStage) {
+			star5.scale.set(2, 2);
+			star5.x = starBarBG.x - 25;
+			star5.y = starBarBase.y - 312;
+		}
+
 		scoreTxt = new FlxText(0, healthBar.y + 40, FlxG.width, "", 20);
 		scoreTxt.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		scoreTxt.scrollFactor.set();
@@ -540,7 +662,7 @@ class PlayState extends MusicBeatState
 			scoreTxt.visible = false;
 
 		songNameWatermark = new FlxText(4, healthBar.y + 50, 0, SONG.song + " - " + Difficulty.getString(), 16);
-		songNameWatermark.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE,FlxColor.BLACK);
+		songNameWatermark.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		songNameWatermark.scrollFactor.set();
 		songNameWatermark.visible = !ClientPrefs.data.hideHud;
 		uiGroup.add(songNameWatermark);
@@ -555,8 +677,8 @@ class PlayState extends MusicBeatState
 		if(ClientPrefs.data.downScroll)
 			shadowEngineLogo.y = FlxG.height - 97;
 
-		shadowEngineWatermark = new FlxText(shadowEngineLogo.x + 95, healthBar.y + 50, 0, (Main.watermarks ? "hadow Engine v" + MainMenuState.psychEngineVersion : ""), 16);
-		shadowEngineWatermark.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE,FlxColor.BLACK);
+		shadowEngineWatermark = new FlxText(shadowEngineLogo.x + 95, healthBar.y + 50, 0, (Main.watermarks ? "hadow Engine v" + MainMenuState.shadowEngineVersion : ""), 16);
+		shadowEngineWatermark.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		shadowEngineWatermark.scrollFactor.set();
 		shadowEngineWatermark.visible = !ClientPrefs.data.hideHud;
 		uiGroup.add(shadowEngineWatermark);
@@ -655,6 +777,30 @@ class PlayState extends MusicBeatState
 		if(eventNotes.length < 1) checkEventNote();
 	}
 
+	function set_shitsGain(value:Float):Float
+	{
+		shitsGain = value;
+		return value;
+	}
+
+	function set_badsGain(value:Float):Float
+	{
+		badsGain = value;
+		return value;
+	}
+
+	function set_goodsGain(value:Float):Float
+	{
+		goodsGain = value;
+		return value;
+	}
+
+	function set_sicksGain(value:Float):Float
+	{
+		sicksGain = value;
+		return value;
+	}
+
 	function set_songSpeed(value:Float):Float
 	{
 		if(generatedMusic)
@@ -718,6 +864,10 @@ class PlayState extends MusicBeatState
 	public function reloadHealthBarColors() {
 		healthBar.setColors(FlxColor.fromRGB(dad.healthColorArray[0], dad.healthColorArray[1], dad.healthColorArray[2]),
 			FlxColor.fromRGB(boyfriend.healthColorArray[0], boyfriend.healthColorArray[1], boyfriend.healthColorArray[2]));
+	}
+
+	public function reloadStarBarColors() {
+		starBar.color = FlxColor.fromRGB(boyfriend.healthColorArray[0], boyfriend.healthColorArray[1], boyfriend.healthColorArray[2]);
 	}
 
 	public function addCharacterToList(newCharacter:String, type:Int) {
@@ -1270,6 +1420,11 @@ class PlayState extends MusicBeatState
 				songSpeed = ClientPrefs.getGameplaySetting('scrollspeed');
 		}
 
+		shitsGain = PlayState.SONG.shitsGain;
+		badsGain = PlayState.SONG.badsGain;
+		goodsGain = PlayState.SONG.goodsGain;
+		sicksGain = PlayState.SONG.sicksGain;
+
 		var songData = SONG;
 		Conductor.bpm = songData.bpm;
 
@@ -1695,6 +1850,90 @@ class PlayState extends MusicBeatState
 			iconP2.animation.curAnim.curFrame = 1;
 		else
 			iconP2.animation.curAnim.curFrame = 0;
+
+		// checking for scale
+		if (starBar.scale.y >= 60 && !star1achieved) {
+			star1achieved = true;
+			if (!ClientPrefs.data.hideHud)
+				FlxG.sound.play(Paths.sound('star1' + starSoundsSuffix), 0.7);
+			if(isPixelStage)
+				FlxTween.tween(star1.scale, {x: 2.2, y: 2.2}, 0.2, {onComplete: function(tween:FlxTween) {
+					FlxTween.tween(star1.scale, {x: 2, y: 2}, 0.2);
+				}});
+			else
+				FlxTween.tween(star1.scale, {x: 1.2, y: 1.2}, 0.2, {onComplete: function(tween:FlxTween) {
+					FlxTween.tween(star1.scale, {x: 1, y: 1}, 0.2);
+				}});
+			starsGained += 1;
+		}
+		if (starBar.scale.y >= 120 && !star2achieved) {
+			star2achieved = true;
+			if (!ClientPrefs.data.hideHud)
+				FlxG.sound.play(Paths.sound('star2' + starSoundsSuffix), 0.7);
+			if(isPixelStage)
+				FlxTween.tween(star2.scale, {x: 2.2, y: 2.2}, 0.2, {onComplete: function(tween:FlxTween) {
+					FlxTween.tween(star2.scale, {x: 2, y: 2}, 0.2);
+				}});
+			else
+				FlxTween.tween(star2.scale, {x: 1.2, y: 1.2}, 0.2, {onComplete: function(tween:FlxTween) {
+					FlxTween.tween(star2.scale, {x: 1, y: 1}, 0.2);
+				}});
+			starsGained += 1;
+		}
+		if (starBar.scale.y >= 180 && !star3achieved) {
+			star3achieved = true;
+			if (!ClientPrefs.data.hideHud)
+				FlxG.sound.play(Paths.sound('star3' + starSoundsSuffix), 0.7);
+			if(isPixelStage)
+				FlxTween.tween(star3.scale, {x: 2.2, y: 2.2}, 0.2, {onComplete: function(tween:FlxTween) {
+					FlxTween.tween(star3.scale, {x: 2, y: 2}, 0.2);
+				}});
+			else
+				FlxTween.tween(star3.scale, {x: 1.2, y: 1.2}, 0.2, {onComplete: function(tween:FlxTween) {
+					FlxTween.tween(star3.scale, {x: 1, y: 1}, 0.2);
+				}});
+			starsGained += 1;
+		}
+		if (starBar.scale.y >= 240 && !star4achieved) {
+			star4achieved = true;
+			if (!ClientPrefs.data.hideHud)
+				FlxG.sound.play(Paths.sound('star4' + starSoundsSuffix), 0.7);
+			if(isPixelStage)
+				FlxTween.tween(star4.scale, {x: 2.2, y: 2.2}, 0.2, {onComplete: function(tween:FlxTween) {
+					FlxTween.tween(star4.scale, {x: 2, y: 2}, 0.2);
+				}});
+			else
+				FlxTween.tween(star4.scale, {x: 1.2, y: 1.2}, 0.2, {onComplete: function(tween:FlxTween) {
+					FlxTween.tween(star4.scale, {x: 1, y: 1}, 0.2);
+				}});
+			starsGained += 1;
+		}
+		if (starBar.scale.y >= 300 && !star5achieved) {
+			star5achieved = true;
+			if (!ClientPrefs.data.hideHud)
+				FlxG.sound.play(Paths.sound('star5' + starSoundsSuffix), 0.7);
+			if(isPixelStage)
+				FlxTween.tween(star5.scale, {x: 2.2, y: 2.2}, 0.2, {onComplete: function(tween:FlxTween) {
+					FlxTween.tween(star5.scale, {x: 2, y: 2}, 0.2);
+				}});
+			else
+				FlxTween.tween(star5.scale, {x: 1.2, y: 1.2}, 0.2, {onComplete: function(tween:FlxTween) {
+					FlxTween.tween(star5.scale, {x: 1, y: 1}, 0.2);
+				}});
+			starsGained += 1;
+		}
+
+		// play anim
+		if (star1achieved)
+			star1.animation.play('glow');
+		if (star2achieved)
+			star2.animation.play('glow');
+		if (star3achieved)
+			star3.animation.play('glow');
+		if (star4achieved)
+			star4.animation.play('glow');
+		if (star5achieved)
+			star5.animation.play('glow');
 
 		if (startedCountdown && !paused)
 		{
@@ -2196,6 +2435,7 @@ class PlayState extends MusicBeatState
 						}
 				}
 				reloadHealthBarColors();
+				reloadStarBarColors();
 
 			case 'Change Scroll Speed':
 				if (songSpeedType != "constant")
@@ -2369,7 +2609,8 @@ class PlayState extends MusicBeatState
 
 		#if ACHIEVEMENTS_ALLOWED
 		var weekNoMiss:String = WeekData.getWeekFileName() + '_nomiss';
-		checkForAchievement([weekNoMiss, 'ur_bad', 'ur_good', 'hype', 'two_keys', 'toastie', 'debugger']);
+		var weekFullStar:String = WeekData.getWeekFileName() + '_fullstar';
+		checkForAchievement([weekNoMiss, weekFullStar, 'ur_bad', 'ur_good', 'hype', 'two_keys', 'toastie', 'debugger']);
 		#end
 
 		var ret:Dynamic = callOnScripts('onEndSong', null, true);
@@ -2378,7 +2619,8 @@ class PlayState extends MusicBeatState
 			#if !switch
 			var percent:Float = ratingPercent;
 			if(Math.isNaN(percent)) percent = 0;
-			Highscore.saveScore(Song.loadedSongName, songScore, storyDifficulty, percent);
+			if(!ClientPrefs.getGameplaySetting('practice') && !ClientPrefs.getGameplaySetting('botplay'))
+				Highscore.saveScore(Song.loadedSongName, songScore, storyDifficulty, percent, starsGained);
 			#end
 			playbackRate = 1;
 
@@ -2392,6 +2634,7 @@ class PlayState extends MusicBeatState
 			{
 				campaignScore += songScore;
 				campaignMisses += songMisses;
+				campaignStars += starsGained;
 
 				storyPlaylist.remove(storyPlaylist[0]);
 
@@ -2408,7 +2651,8 @@ class PlayState extends MusicBeatState
 					// if ()
 					if(!ClientPrefs.getGameplaySetting('practice') && !ClientPrefs.getGameplaySetting('botplay')) {
 						StoryMenuState.weekCompleted.set(WeekData.weeksList[storyWeek], true);
-						Highscore.saveWeekScore(WeekData.getWeekFileName(), campaignScore, storyDifficulty);
+						Highscore.saveWeekScore(WeekData.getWeekFileName(), campaignScore, storyDifficulty, campaignStars);
+						campaignStars = 0;
 
 						FlxG.save.data.weekCompleted = StoryMenuState.weekCompleted;
 						FlxG.save.flush();
@@ -2602,6 +2846,7 @@ class PlayState extends MusicBeatState
 		currentTimingShown.acceleration.y = 600;
 		currentTimingShown.velocity.y -= 150;
 		currentTimingShown.velocity.x += comboSpr.velocity.x;
+		currentTimingShown.visible = !ClientPrefs.data.hideHud;
 		comboGroup.add(currentTimingShown);
 
 		if (currentTimingShown.alpha != 1)
@@ -3031,6 +3276,9 @@ class PlayState extends MusicBeatState
 
 	public function goodNoteHit(note:Note):Void
 	{
+		var scaleNoteDiff:Float = Math.abs(note.strumTime - Conductor.songPosition + ClientPrefs.data.ratingOffset);
+		var daScaleRating:Rating = Conductor.judgeNote(ratingsData, scaleNoteDiff / playbackRate);
+
 		if(note.wasGoodHit) return;
 		if(cpuControlled && note.ignoreNote) return;
 
@@ -3102,8 +3350,24 @@ class PlayState extends MusicBeatState
 				if(combo > 9999) combo = 9999;
 				popUpScore(note);
 			}
-			if (!guitarHeroSustains && note.isSustainNote)
-				health += note.hitHealth * healthGain;
+
+			if (starBar.scale.y < 350) {
+				var newScale = scale;
+			
+				if (daScaleRating.ratingMod <= 0)
+					newScale += shitsGain;
+				else if (daScaleRating.ratingMod <= 0.34)
+					newScale += badsGain;
+				else if (daScaleRating.ratingMod <= 0.67)
+					newScale += goodsGain;
+				else
+					newScale += sicksGain;
+			
+				scale = Math.min(newScale, 350);
+			}
+
+			starBar.y = nota - (scale / 2);
+			starBar.scale.y = scale;
 		}
 		else //Notes that count as a miss if you hit them (Hurt notes for example)
 		{
@@ -3582,7 +3846,7 @@ class PlayState extends MusicBeatState
 			if(!Achievements.exists(name)) continue;
 
 			var unlock:Bool = false;
-			if (name != WeekData.getWeekFileName() + '_nomiss') // common achievements
+			if (name != WeekData.getWeekFileName() + '_nomiss' && name != WeekData.getWeekFileName() + '_fullstar') // common achievements
 			{
 				switch(name)
 				{
@@ -3610,9 +3874,20 @@ class PlayState extends MusicBeatState
 			}
 			else // any FC achievements, name should be "weekFileName_nomiss", e.g: "week3_nomiss";
 			{
-				if(isStoryMode && campaignMisses + songMisses < 1 && Difficulty.getString().toUpperCase() == 'HARD'
+				if(isStoryMode && Difficulty.getString().toUpperCase() == 'HARD'
 					&& storyPlaylist.length <= 1 && !changedDifficulty && !usedPractice)
-					unlock = true;
+				{
+					if (name == WeekData.getWeekFileName() + '_nomiss')
+					{
+						if (campaignMisses + songMisses < 1) 
+							unlock = true;
+					}
+					else if (name == WeekData.getWeekFileName() + '_fullstar')
+					{
+						if (campaignStars + starsGained == 15)
+							unlock = true;
+					}
+				}
 			}
 
 			if(unlock) Achievements.unlock(name);

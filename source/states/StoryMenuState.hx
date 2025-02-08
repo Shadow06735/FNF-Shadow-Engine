@@ -20,6 +20,7 @@ class StoryMenuState extends MusicBeatState
 	public static var weekCompleted:Map<String, Bool> = new Map<String, Bool>();
 
 	var scoreText:FlxText;
+	var starsText:FlxText;
 
 	private static var lastDifficultyName:String = '';
 	var curDifficulty:Int = 1;
@@ -40,6 +41,7 @@ class StoryMenuState extends MusicBeatState
 	var sprDifficulty:FlxSprite;
 	var leftArrow:FlxSprite;
 	var rightArrow:FlxSprite;
+	var star:FlxSprite;
 
 	var loadedWeeks:Array<WeekData> = [];
 
@@ -165,9 +167,17 @@ class StoryMenuState extends MusicBeatState
 		rightArrow.animation.play('idle');
 		difficultySelectors.add(rightArrow);
 
+		star = new FlxSprite(925, grpWeekText.members[0].y + 130).loadGraphic(Paths.image('stars/storyMenuStar'));
+		star.antialiasing = ClientPrefs.data.antialiasing;
+		star.scale.set(1.2, 1.2);
+
+		starsText = new FlxText(star.x + 100, star.y + 10, 0, Language.getPhrase('stars', '{1}', [lerpStars]), 60);
+		starsText.setFormat("VCR OSD Mono", 60);
+
 		add(bgYellow);
 		add(bgSprite);
 		add(grpWeekCharacters);
+		add(star);
 
 		txtTracklist = new FlxText(FlxG.width * 0.05, bgYellow.x + bgYellow.y + 425, 0, "Tracks", 32);
 		txtTracklist.alignment = CENTER;
@@ -176,6 +186,7 @@ class StoryMenuState extends MusicBeatState
 		add(txtTracklist);
 		add(scoreText);
 		add(txtWeekTitle);
+		add(starsText);
 
 		changeWeek();
 		changeDifficulty();
@@ -210,6 +221,14 @@ class StoryMenuState extends MusicBeatState
 			if(Math.abs(intendedScore - lerpScore) < 10) lerpScore = intendedScore;
 	
 			scoreText.text = Language.getPhrase('level_score', 'LEVEL SCORE:{1}', [lerpScore]);
+		}
+
+		if(intendedStars != lerpStars)
+		{
+			lerpStars = Math.floor(FlxMath.lerp(intendedStars, lerpStars, 0.5));
+			if(Math.abs(intendedStars - lerpStars) < 2) lerpStars = intendedStars;
+	
+			starsText.text = Language.getPhrase('stars', '{1}', [lerpStars]);
 		}
 
 		// FlxG.watch.addQuick('font', scoreText.font);
@@ -387,11 +406,14 @@ class StoryMenuState extends MusicBeatState
 
 		#if !switch
 		intendedScore = Highscore.getWeekScore(loadedWeeks[curWeek].fileName, curDifficulty);
+		intendedStars = Highscore.getWeekStars(loadedWeeks[curWeek].fileName, curDifficulty);
 		#end
 	}
 
 	var lerpScore:Int = 49324858;
 	var intendedScore:Int = 0;
+	var lerpStars:Int = 0;
+	var intendedStars:Int = 0;
 
 	function changeWeek(change:Int = 0):Void
 	{
@@ -476,6 +498,7 @@ class StoryMenuState extends MusicBeatState
 
 		#if !switch
 		intendedScore = Highscore.getWeekScore(loadedWeeks[curWeek].fileName, curDifficulty);
+		intendedStars = Highscore.getWeekStars(loadedWeeks[curWeek].fileName, curDifficulty);
 		#end
 	}
 }

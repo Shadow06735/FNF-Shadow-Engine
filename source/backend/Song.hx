@@ -14,6 +14,10 @@ typedef SwagSong =
 	var needsVoices:Bool;
 	var speed:Float;
 	var offset:Float;
+	var shitsGain:Float;
+	var badsGain:Float;
+	var goodsGain:Float;
+	var sicksGain:Float;
 
 	var player1:String;
 	var player2:String;
@@ -49,6 +53,10 @@ class Song
 	public var notes:Array<SwagSection>;
 	public var events:Array<Dynamic>;
 	public var bpm:Float;
+	public var shitsGain:Float = 0.5;
+	public var badsGain:Float = 1;
+	public var goodsGain:Float = 1.5;
+	public var sicksGain:Float = 2;
 	public var needsVoices:Bool = true;
 	public var arrowSkin:String;
 	public var splashSkin:String;
@@ -62,9 +70,9 @@ class Song
 	public var player1:String = 'bf';
 	public var player2:String = 'dad';
 	public var gfVersion:String = 'gf';
-	public var format:String = 'psych_v1';
+	public var format:String = 'shadowEngine';
 
-	public static function convert(songJson:Dynamic) // Convert old charts to psych_v1 format
+	public static function convert(songJson:Dynamic) // Convert old charts to shadowEngine format
 	{
 		if(songJson.gfVersion == null)
 		{
@@ -151,7 +159,7 @@ class Song
 		return rawData != null ? parseJSON(rawData, jsonInput) : null;
 	}
 
-	public static function parseJSON(rawData:String, ?nameForError:String = null, ?convertTo:String = 'psych_v1'):SwagSong
+	public static function parseJSON(rawData:String, ?nameForError:String = null, ?convertTo:String = 'shadowEngine'):SwagSong
 	{
 		var songJson:SwagSong = cast Json.parse(rawData);
 		if(Reflect.hasField(songJson, 'song'))
@@ -168,11 +176,11 @@ class Song
 
 			switch(convertTo)
 			{
-				case 'psych_v1':
-					if(!fmt.startsWith('psych_v1')) //Convert to Psych 1.0 format
+				case 'shadowEngine':
+					if(!fmt.startsWith('shadowEngine')) //Convert to Psych 1.0 format
 					{
-						trace('converting chart $nameForError with format $fmt to psych_v1 format...');
-						songJson.format = 'psych_v1_convert';
+						trace('converting chart $nameForError with format $fmt to shadowEngine format...');
+						songJson.format = 'shadowEngine_convert';
 						convert(songJson);
 					}
 			}

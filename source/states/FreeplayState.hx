@@ -30,11 +30,15 @@ class FreeplayState extends MusicBeatState
 	var scoreBG:FlxSprite;
 	var scoreText:FlxText;
 	var accText:FlxText;
+	var starsText:FlxText;
 	var diffText:FlxText;
 	var lerpScore:Int = 0;
 	var lerpRating:Float = 0;
+	var lerpStars:Int = 0;
 	var intendedScore:Int = 0;
+	var intendedStars:Int = 0;
 	var intendedRating:Float = 0;
+	var star:FlxSprite;
 
 	private var grpSongs:FlxTypedGroup<Alphabet>;
 	private var curPlaying:Bool = false;
@@ -140,17 +144,23 @@ class FreeplayState extends MusicBeatState
 		accText = new FlxText(scoreText.x, scoreText.y + 36, 0, "", 24);
 		accText.font = scoreText.font;
 
-		scoreBG = new FlxSprite(scoreText.x - 6, 0).makeGraphic(Std.int(FlxG.width * 0.35), 95, 0xFF000000);
+		scoreBG = new FlxSprite(scoreText.x - 6, 0).makeGraphic(Std.int(FlxG.width * 0.35), 134, 0xFF000000);
 		scoreBG.alpha = 0.6;
 		add(scoreBG);
 
-		diffText = new FlxText(scoreText.x, scoreText.y + 66, 0, "", 24);
+		star = new FlxSprite(scoreText.x, scoreText.y + 66).loadGraphic(Paths.image('stars/freeplayStar'));
+		add(star);
+
+		starsText = new FlxText(star.x + 45, scoreText.y + 70, 0, "", 28);
+		starsText.font = scoreText.font;
+
+		diffText = new FlxText(scoreText.x, scoreText.y + 106, 0, "", 24);
 		diffText.font = scoreText.font;
 		add(diffText);
 
 		add(scoreText);
 		add(accText);
-
+		add(starsText);
 
 		missingTextBG = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
 		missingTextBG.alpha = 0.6;
@@ -209,11 +219,23 @@ class FreeplayState extends MusicBeatState
 
 		lerpScore = Math.floor(FlxMath.lerp(intendedScore, lerpScore, 0.4));
 		lerpRating = FlxMath.lerp(intendedRating, lerpRating, 0.4);
+		lerpStars = Math.floor(FlxMath.lerp(intendedStars, lerpStars, 0.4));
 
 		if (Math.abs(lerpScore - intendedScore) <= 10)
 			lerpScore = intendedScore;
 		if (Math.abs(lerpRating - intendedRating) <= 0.01)
 			lerpRating = intendedRating;
+		if (Math.abs(lerpStars - intendedStars) <= 2)
+			lerpStars = intendedStars;
+
+		if (intendedStars == 5) {
+			star.color = FlxColor.YELLOW;
+			starsText.color = FlxColor.YELLOW;
+		}
+		else {
+			star.color = FlxColor.WHITE;
+			starsText.color = FlxColor.WHITE;
+		}
 
 		var ratingSplit:Array<String> = Std.string(CoolUtil.floorDecimal(lerpRating * 100, 2)).split('.');
 		if(ratingSplit.length < 2) //No decimals, add an empty space
@@ -229,6 +251,7 @@ class FreeplayState extends MusicBeatState
 		{
 			scoreText.text = Language.getPhrase('personal_best', 'PERSONAL BEST:{1}', [lerpScore]);
 			accText.text = Language.getPhrase('accuracy', 'ACCURACY:{2}%', [lerpRating, ratingSplit.join('.')]);
+			starsText.text = Language.getPhrase('stars', '{1}', [lerpStars]);
 			
 			if(songs.length > 1)
 			{
@@ -414,6 +437,7 @@ class FreeplayState extends MusicBeatState
 		#if !switch
 		intendedScore = Highscore.getScore(songs[curSelected].songName, curDifficulty);
 		intendedRating = Highscore.getRating(songs[curSelected].songName, curDifficulty);
+		intendedStars = Highscore.getStars(songs[curSelected].songName, curDifficulty);
 		#end
 
 		lastDifficultyName = Difficulty.getString(curDifficulty, false);

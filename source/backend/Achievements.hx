@@ -40,6 +40,13 @@ class Achievements {
 		createAchievement('hype',					{name: "Hyperactive", description: "Finish a Song without going back to Idle."});
 		createAchievement('two_keys',				{name: "Just the Two of Us", description: "Finish a Song pressing only two keys."});
 		createAchievement('toastie',				{name: "Toaster Gamer", description: "Have you tried to run the game on a toaster?"});
+		createAchievement('week1_fullstar',			{name: "Beginner Star Collector", description: "Beat Week 1 on Hard with all 15 stars."});
+		createAchievement('week2_fullstar',			{name: "Getting there...", description: "Beat Week 2 on Hard with all 15 stars."});
+		createAchievement('week3_fullstar',			{name: "Not Today Man", description: "Beat Week 3 on Hard with all 15 stars."});
+		createAchievement('week4_fullstar',			{name: "Shining Sun", description: "Beat Week 4 on Hard with all 15 stars."});
+		createAchievement('week5_fullstar',			{name: "Christmas Treetop", description: "Beat Week 5 on Hard with all 15 stars."});
+		createAchievement('week6_fullstar',			{name: "You got a Star!", description: "Beat Week 6 on Hard with all 15 stars."});
+		createAchievement('week7_fullstar',			{name: "Intermediate", description: "Beat Week 7 on Hard with all 15 stars."});
 		createAchievement('debugger',				{name: "Debugger", description: "Beat the \"Test\" Stage from the Chart Editor.", hidden: true});
 		
 		//dont delete this thing below

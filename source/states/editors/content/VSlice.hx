@@ -254,17 +254,21 @@ class VSlice
 				needsVoices: true, //There's no value on V-Slice to identify if there are vocals as it checks automatically
 				speed: scrollSpeed,
 				offset: 0,
+				shitsGain: 0.5,
+				badsGain: 1,
+				goodsGain: 1.5,
+				sicksGain: 2,
 			
 				player1: metadata.playData.characters.player,
 				player2: metadata.playData.characters.opponent,
 				gfVersion: metadata.playData.characters.girlfriend,
 				stage: stage,
-				format: 'psych_v1_convert'
+				format: 'shadowEngine'
 			}
 
 			Reflect.setField(swagSong, 'artist', metadata.artist);
 			Reflect.setField(swagSong, 'charter', metadata.charter);
-			Reflect.setField(swagSong, 'generatedBy', 'Psych Engine v${MainMenuState.psychEngineVersion} - Chart Editor V-Slice Importer');
+			Reflect.setField(swagSong, 'generatedBy', 'Psych Engine v${MainMenuState.shadowEngineVersion} - Chart Editor V-Slice Importer');
 			songDifficulties.set(diff, swagSong);
 		}
 		var pack:PsychPackage = {difficulties: songDifficulties, events: null};
@@ -309,7 +313,7 @@ class VSlice
 				fileEvents.push([event.t, [fields]]);
 			}
 			fileEvents.sort(sortByTime);
-			pack.events = {events: fileEvents, format: 'psych_v1_convert'};
+			pack.events = {events: fileEvents, format: 'shadowEngine'};
 		}
 		return pack;
 	}
@@ -329,7 +333,7 @@ class VSlice
 		}
 
 		var notes:Array<VSliceNote> = [];
-		var generatedBy:String = 'Psych Engine v${MainMenuState.psychEngineVersion} - Chart Editor V-Slice Exporter';
+		var generatedBy:String = 'Shadow Engine v${MainMenuState.shadowEngineVersion} - Chart Editor V-Slice Exporter';
 		var timeChanges:Array<VSliceTimeChange> = [];
 
 		var time:Float = 0;
