@@ -35,6 +35,7 @@ typedef VSliceEvent =
 typedef VSliceMetadata = 
 {
 	var songName:String;
+	var artistName:String;
 	var artist:String;
 	var charter:String;
 	var playData:VSlicePlayData;
@@ -248,6 +249,7 @@ class VSlice
 
 			var swagSong:SwagSong = {
 				song: metadata.songName,
+				artistName: metadata.artistName,
 				notes: sectionData,
 				events: [],
 				bpm: songBpm,
@@ -443,6 +445,7 @@ class VSlice
 		}
 		var metadata:VSliceMetadata = {
 			songName: songData.song,
+			artistName: songData.artistName,
 			artist: composer,
 			charter: charter,
 			playData: {

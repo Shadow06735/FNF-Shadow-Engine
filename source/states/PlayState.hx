@@ -127,6 +127,12 @@ class PlayState extends MusicBeatState
 	public static var stageUI:String = "normal";
 	public static var isPixelStage(get, never):Bool;
 
+	// Shadow Engine functions
+	public static var flipHud:Bool = false;
+	public static var showOnlyStrums:Bool = false;
+	public static var playerStrumsVisible:Bool = true;
+	public static var opponentStrumsVisible:Bool = true;
+
 	@:noCompletion
 	static function get_isPixelStage():Bool
 		return stageUI == "pixel" || stageUI.endsWith("-pixel");
@@ -540,7 +546,10 @@ class PlayState extends MusicBeatState
 		healthBar.scrollFactor.set();
 		healthBar.visible = !ClientPrefs.data.hideHud;
 		healthBar.alpha = ClientPrefs.data.healthBarAlpha;
-		reloadHealthBarColors();
+		if(ClientPrefs.data.legacyColors)
+			healthBar.setColors(0xFFFF0000, 0xFF66FF33);
+		else
+			reloadHealthBarColors();
 		uiGroup.add(healthBar);
 
 		iconP1 = new HealthIcon(boyfriend.healthIcon, true);
@@ -578,7 +587,10 @@ class PlayState extends MusicBeatState
 		starBar.scrollFactor.set();
 		starBar.scale.y = 0;
 		starBar.visible = !ClientPrefs.data.hideHud;
-		reloadStarBarColors();
+		if(ClientPrefs.data.legacyColors)
+			starBar.color = FlxColor.CYAN;
+		else
+			reloadStarBarColors();
 		uiGroup.add(starBar);
 
 		star1 = new FlxSprite(starBarBG.x - 35, starBarBase.y - 88);
@@ -669,21 +681,22 @@ class PlayState extends MusicBeatState
 		if(ClientPrefs.data.downScroll)
 			songNameWatermark.y = FlxG.height * 0.9 + 45;
 
-		shadowEngineLogo = new FlxSprite(songNameWatermark.x + 1020, FlxG.height - 99).loadGraphic(Paths.image('shadowEngineLogo'));
+		shadowEngineWatermark = new FlxText(20, healthBar.y + 50, 0, (Main.watermarks ? "hadow Engine v" + MainMenuState.shadowEngineVersion : ""), 16);
+		shadowEngineWatermark.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		shadowEngineWatermark.scrollFactor.set();
+		shadowEngineWatermark.visible = !ClientPrefs.data.hideHud;
+		shadowEngineWatermark.x = FlxG.width - (shadowEngineWatermark.width + 4);
+		uiGroup.add(shadowEngineWatermark);
+		if(ClientPrefs.data.downScroll)
+			shadowEngineWatermark.y = FlxG.height * 0.9 + 45;
+		
+		shadowEngineLogo = new FlxSprite(shadowEngineWatermark.x - 95, FlxG.height - 99).loadGraphic(Paths.image('shadowEngineLogo'));
 		shadowEngineLogo.scrollFactor.set();
 		shadowEngineLogo.visible = !ClientPrefs.data.hideHud;
 		shadowEngineLogo.scale.set(0.3, 0.3);
 		uiGroup.add(shadowEngineLogo);
 		if(ClientPrefs.data.downScroll)
 			shadowEngineLogo.y = FlxG.height - 97;
-
-		shadowEngineWatermark = new FlxText(shadowEngineLogo.x + 95, healthBar.y + 50, 0, (Main.watermarks ? "hadow Engine v" + MainMenuState.shadowEngineVersion : ""), 16);
-		shadowEngineWatermark.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-		shadowEngineWatermark.scrollFactor.set();
-		shadowEngineWatermark.visible = !ClientPrefs.data.hideHud;
-		uiGroup.add(shadowEngineWatermark);
-		if(ClientPrefs.data.downScroll)
-			shadowEngineWatermark.y = FlxG.height * 0.9 + 45;
 
 		botplayTxt = new FlxText(400, timeBar.y + 500, FlxG.width - 800, Language.getPhrase("Botplay").toUpperCase(), 32);
 		botplayTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
@@ -697,6 +710,12 @@ class PlayState extends MusicBeatState
 		uiGroup.cameras = [camHUD];
 		noteGroup.cameras = [camHUD];
 		comboGroup.cameras = [camHUD];
+
+		// have to put this cuz apparently the shit doesn't reset when playing a different song without the script
+		flipHud = false;
+		showOnlyStrums = false;
+		playerStrumsVisible = true;
+		opponentStrumsVisible = true;
 
 		startingSong = true;
 
@@ -773,6 +792,7 @@ class PlayState extends MusicBeatState
 
 		cacheCountdown();
 		cachePopUpScore();
+		flipStrums();
 
 		if(eventNotes.length < 1) checkEventNote();
 	}
@@ -1697,6 +1717,24 @@ class PlayState extends MusicBeatState
 		}
 	}
 
+	function flipStrums()
+	{
+		for (i in 0...4)
+		{
+			var playerStrum = strumLineNotes.members[i];
+			var opponentStrum = strumLineNotes.members[i + 4];
+			var tempX = playerStrum.x;
+			if (playerStrum != null && opponentStrum != null)
+			{		
+				if (flipHud)
+				{
+					playerStrum.x = opponentStrum.x;
+					opponentStrum.x = tempX;
+				}
+			}
+		}
+	}
+
 	override function openSubState(SubState:FlxSubState)
 	{
 		stagesFunc(function(stage:BaseStage) stage.openSubState(SubState));
@@ -1835,6 +1873,70 @@ class PlayState extends MusicBeatState
 		if (healthBar.bounds.max != null && health > healthBar.bounds.max)
 			health = healthBar.bounds.max;
 
+		// handling all the Shadow Engine functions here cuz yes
+		if (flipHud)
+		{
+			iconP1.flipX = true;
+			iconP2.flipX = true;
+			healthBar.flipX = true;
+		}
+		else
+		{
+			iconP1.flipX = false;
+			iconP2.flipX = false;
+			healthBar.flipX = false;
+		}
+
+		if (showOnlyStrums)
+		{
+			healthBar.visible = false;
+			iconP1.visible = false;
+			iconP2.visible = false;
+			starBarBase.visible = false;
+			starBarBG.visible = false;
+			starBar.visible = false;
+			star1.visible = false;
+			star2.visible = false;
+			star3.visible = false;
+			star4.visible = false;
+			star5.visible = false;
+			scoreTxt.visible = false;
+			songNameWatermark.visible = false;
+			shadowEngineWatermark.visible = false;
+			shadowEngineLogo.visible = false;
+		}
+		else
+		{
+			healthBar.visible = !ClientPrefs.data.hideHud;
+			iconP1.visible = !ClientPrefs.data.hideHud;
+			iconP2.visible = !ClientPrefs.data.hideHud;
+			starBarBase.visible = !ClientPrefs.data.hideHud;
+			starBarBG.visible = !ClientPrefs.data.hideHud;
+			starBar.visible = !ClientPrefs.data.hideHud;
+			star1.visible = !ClientPrefs.data.hideHud;
+			star2.visible = !ClientPrefs.data.hideHud;
+			star3.visible = !ClientPrefs.data.hideHud;
+			star4.visible = !ClientPrefs.data.hideHud;
+			star5.visible = !ClientPrefs.data.hideHud;
+			scoreTxt.visible = (!cpuControlled && !ClientPrefs.data.hideHud);
+			songNameWatermark.visible = !ClientPrefs.data.hideHud;
+			shadowEngineWatermark.visible = !ClientPrefs.data.hideHud;
+			shadowEngineLogo.visible = !ClientPrefs.data.hideHud;
+		}
+
+		for (i in 0...4)
+		{
+			if (!playerStrumsVisible)
+				playerStrums.members[i].visible = false;
+			else
+				playerStrums.members[i].visible = true;
+
+			if (!opponentStrumsVisible)
+				opponentStrums.members[i].visible = false;
+			else
+				opponentStrums.members[i].visible = ClientPrefs.data.opponentStrums;
+		}
+
 		updateIconsScale(elapsed);
 		updateIconsPosition();
 
@@ -1854,7 +1956,7 @@ class PlayState extends MusicBeatState
 		// checking for scale
 		if (starBar.scale.y >= 60 && !star1achieved) {
 			star1achieved = true;
-			if (!ClientPrefs.data.hideHud)
+			if (!ClientPrefs.data.hideHud && !showOnlyStrums)
 				FlxG.sound.play(Paths.sound('star1' + starSoundsSuffix), 0.7);
 			if(isPixelStage)
 				FlxTween.tween(star1.scale, {x: 2.2, y: 2.2}, 0.2, {onComplete: function(tween:FlxTween) {
@@ -1868,7 +1970,7 @@ class PlayState extends MusicBeatState
 		}
 		if (starBar.scale.y >= 120 && !star2achieved) {
 			star2achieved = true;
-			if (!ClientPrefs.data.hideHud)
+			if (!ClientPrefs.data.hideHud && !showOnlyStrums)
 				FlxG.sound.play(Paths.sound('star2' + starSoundsSuffix), 0.7);
 			if(isPixelStage)
 				FlxTween.tween(star2.scale, {x: 2.2, y: 2.2}, 0.2, {onComplete: function(tween:FlxTween) {
@@ -1882,7 +1984,7 @@ class PlayState extends MusicBeatState
 		}
 		if (starBar.scale.y >= 180 && !star3achieved) {
 			star3achieved = true;
-			if (!ClientPrefs.data.hideHud)
+			if (!ClientPrefs.data.hideHud && !showOnlyStrums)
 				FlxG.sound.play(Paths.sound('star3' + starSoundsSuffix), 0.7);
 			if(isPixelStage)
 				FlxTween.tween(star3.scale, {x: 2.2, y: 2.2}, 0.2, {onComplete: function(tween:FlxTween) {
@@ -1896,7 +1998,7 @@ class PlayState extends MusicBeatState
 		}
 		if (starBar.scale.y >= 240 && !star4achieved) {
 			star4achieved = true;
-			if (!ClientPrefs.data.hideHud)
+			if (!ClientPrefs.data.hideHud && !showOnlyStrums)
 				FlxG.sound.play(Paths.sound('star4' + starSoundsSuffix), 0.7);
 			if(isPixelStage)
 				FlxTween.tween(star4.scale, {x: 2.2, y: 2.2}, 0.2, {onComplete: function(tween:FlxTween) {
@@ -1910,7 +2012,7 @@ class PlayState extends MusicBeatState
 		}
 		if (starBar.scale.y >= 300 && !star5achieved) {
 			star5achieved = true;
-			if (!ClientPrefs.data.hideHud)
+			if (!ClientPrefs.data.hideHud && !showOnlyStrums)
 				FlxG.sound.play(Paths.sound('star5' + starSoundsSuffix), 0.7);
 			if(isPixelStage)
 				FlxTween.tween(star5.scale, {x: 2.2, y: 2.2}, 0.2, {onComplete: function(tween:FlxTween) {
@@ -2095,8 +2197,17 @@ class PlayState extends MusicBeatState
 	public dynamic function updateIconsPosition()
 	{
 		var iconOffset:Int = 26;
-		iconP1.x = healthBar.x + (healthBar.width * (FlxMath.remapToRange(healthBar.percent, 0, 100, 100, 0) * 0.01) - iconOffset);
-		iconP2.x = healthBar.x + (healthBar.width * (FlxMath.remapToRange(healthBar.percent, 0, 100, 100, 0) * 0.01)) - (iconP2.width - iconOffset);
+		var iconOffset2:Int = 98;
+
+		if(flipHud) {
+			iconOffset = 627;
+			iconP1.x = healthBar.x - (healthBar.width * (FlxMath.remapToRange(healthBar.percent, 0, 100, 100, 0) * 0.01)) - (iconP1.width - iconOffset);
+			iconP2.x = healthBar.x - (healthBar.width * (FlxMath.remapToRange(healthBar.percent, 0, 100, 100, 0) * 0.01)) - (iconP1.width - (iconOffset + iconOffset2));
+		}
+		else {
+			iconP1.x = healthBar.x + (healthBar.width * (FlxMath.remapToRange(healthBar.percent, 0, 100, 100, 0) * 0.01) - iconOffset);
+			iconP2.x = healthBar.x + (healthBar.width * (FlxMath.remapToRange(healthBar.percent, 0, 100, 100, 0) * 0.01)) - (iconP2.width - iconOffset);
+		}
 	}
 
 	function openPauseMenu()
@@ -2434,8 +2545,11 @@ class PlayState extends MusicBeatState
 							setOnScripts('gfName', gf.curCharacter);
 						}
 				}
-				reloadHealthBarColors();
-				reloadStarBarColors();
+				if(!ClientPrefs.data.legacyColors)
+				{
+					reloadHealthBarColors();
+					reloadStarBarColors();
+				}
 
 			case 'Change Scroll Speed':
 				if (songSpeedType != "constant")

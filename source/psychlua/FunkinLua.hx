@@ -705,6 +705,23 @@ class FunkinLua {
 		Lua_helper.add_callback(lua, "getColorFromString", function(color:String) return FlxColor.fromString(color));
 		Lua_helper.add_callback(lua, "getColorFromHex", function(color:String) return FlxColor.fromString('#$color'));
 
+		// Shadow Engine functions
+		Lua_helper.add_callback(lua, "flipHud", function(flipHud:Bool = true) {
+			PlayState.flipHud = flipHud;
+		});
+
+		Lua_helper.add_callback(lua, "showOnlyStrums", function(showOnlyStrums:Bool = true) {
+			PlayState.showOnlyStrums = showOnlyStrums;
+		});
+
+		Lua_helper.add_callback(lua, "playerStrumsVisible", function(playerStrumsVisible:Bool = true) {
+			PlayState.playerStrumsVisible = playerStrumsVisible;
+		});
+
+		Lua_helper.add_callback(lua, "opponentStrumsVisible", function(opponentStrumsVisible:Bool = true) {
+			PlayState.opponentStrumsVisible = opponentStrumsVisible;
+		});
+
 		// precaching
 		Lua_helper.add_callback(lua, "addCharacterToList", function(name:String, type:String) {
 			var charType:Int = 0;

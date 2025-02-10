@@ -41,6 +41,7 @@ import states.TitleState;
 	public var timeBarType:String = 'Time Left';
 	public var noReset:Bool = false;
 	public var healthBarAlpha:Float = 1;
+	public var legacyColors:Bool = false;
 	public var hitsoundVolume:Float = 0;
 	public var pauseMusic:String = 'Tea Time';
 	public var checkForUpdates:Bool = true;

@@ -105,6 +105,12 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 		option.changeValue = 0.1;
 		option.decimals = 1;
 		addOption(option);
+
+		var option:Option = new Option('Legacy Health Colors',
+			"If checked, uses base game health colors. Additionally, the star bar will use a default cyan color.",
+			'legacyColors',
+			BOOL);
+		addOption(option);
 		
 		#if !mobile
 		var option:Option = new Option('FPS Counter',

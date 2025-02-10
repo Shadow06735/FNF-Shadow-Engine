@@ -575,6 +575,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 	{
 		var song:SwagSong = {
 			song: 'Test',
+			artistName: 'None',
 			notes: [],
 			events: [],
 			bpm: 150,
@@ -618,6 +619,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 
 		// SONG TAB
 		songNameInputText.text = PlayState.SONG.song;
+		artistNameInputText.text = PlayState.SONG.artistName;
 		allowVocalsCheckBox.checked = (PlayState.SONG.needsVoices != false); //If the song for some reason does not have this value, it will be set to true
 
 		shitsValueStepper.value = PlayState.SONG.shitsGain;
@@ -3155,6 +3157,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 	}
 
 	var songNameInputText:PsychUIInputText;
+	var artistNameInputText:PsychUIInputText;
 	var allowVocalsCheckBox:PsychUICheckBox;
 
 	var bpmStepper:PsychUINumericStepper;
@@ -3175,12 +3178,15 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 		songNameInputText = new PsychUIInputText(objX, objY, 100, 'None', 8);
 		songNameInputText.onChange = function(old:String, cur:String) PlayState.SONG.song = cur;
 
+		artistNameInputText = new PsychUIInputText(objX + 110, objY, 100, 'None', 8);
+		artistNameInputText.onChange = function(old:String, cur:String) PlayState.SONG.artistName = cur;
+
 		allowVocalsCheckBox = new PsychUICheckBox(objX, objY + 20, 'Allow Vocals', 80, function()
 		{
 			PlayState.SONG.needsVoices = allowVocalsCheckBox.checked;
 			loadMusic();
 		});
-		var reloadAudioButton:PsychUIButton = new PsychUIButton(objX + 120, objY, 'Reload Audio', function() loadMusic(true), 80);
+		var reloadAudioButton:PsychUIButton = new PsychUIButton(objX + 230, objY, 'Reload Audio', function() loadMusic(true), 80);
 
 		objY += 65;
 		//(x:Float = 0, y:Float = 0, step:Float = 1, defValue:Float = 0, min:Float = -999, max:Float = 999, decimals:Int = 0, ?wid:Int = 60, ?isPercent:Bool = false)
@@ -3204,7 +3210,9 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 		};
 
 		tab_group.add(new FlxText(songNameInputText.x, songNameInputText.y - 15, 80, 'Song Name:'));
+		tab_group.add(new FlxText(artistNameInputText.x, artistNameInputText.y - 15, 80, 'Artist Name:'));
 		tab_group.add(songNameInputText);
+		tab_group.add(artistNameInputText);
 		tab_group.add(allowVocalsCheckBox);
 		tab_group.add(reloadAudioButton);
 
