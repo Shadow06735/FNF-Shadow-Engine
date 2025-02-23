@@ -167,7 +167,7 @@ class GameOverSubstate extends MusicBeatSubstate
 				PlayState.seenCutscene = false;
 				PlayState.chartingMode = false;
 
-				Application.current.window.title = "Friday Night Funkin': Shadow Engine";
+				Application.current.window.title = Main.appName;
 	
 				Mods.loadTopMod();
 				if (PlayState.isStoryMode) {

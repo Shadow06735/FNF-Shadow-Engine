@@ -325,7 +325,7 @@ class FreeplayState extends MusicBeatState
 			else 
 			{
 				persistentUpdate = false;
-				Application.current.window.title = "Friday Night Funkin': Shadow Engine";
+				Application.current.window.title = Main.appName;
 				MusicBeatState.switchState(new MainMenuState());
 			}
 		}
@@ -349,12 +349,12 @@ class FreeplayState extends MusicBeatState
     		instPlaying = curSelected;
 
 			var listenin:String = 'Freeplay - Now Playing: ' + PlayState.SONG.song;
-			Application.current.window.title = "Friday Night Funkin': Shadow Engine" + ' | ' + listenin;
+			Application.current.window.title = Main.appName + ' | ' + listenin;
 		}
 		else if (controls.ACCEPT && !player.playingMusic)
 		{
 			persistentUpdate = false;
-			Application.current.window.title = "Friday Night Funkin': Shadow Engine";
+			Application.current.window.title = Main.appName;
 
 			var songLowercase:String = Paths.formatToSongPath(songs[curSelected].songName);
 			var poop:String = Highscore.formatSong(songLowercase, curDifficulty);

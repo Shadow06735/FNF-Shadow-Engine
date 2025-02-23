@@ -13,6 +13,7 @@ import flixel.tweens.FlxTween;
 import flixel.util.FlxSort;
 import flixel.util.FlxStringUtil;
 import flixel.util.FlxSave;
+import flixel.ui.FlxBar;
 import flixel.input.keyboard.FlxKey;
 import flixel.animation.FlxAnimationController;
 import lime.utils.Assets;
@@ -130,8 +131,6 @@ class PlayState extends MusicBeatState
 	// Shadow Engine functions
 	public static var flipHud:Bool = false;
 	public static var showOnlyStrums:Bool = false;
-	public static var playerStrumsVisible:Bool = true;
-	public static var opponentStrumsVisible:Bool = true;
 
 	@:noCompletion
 	static function get_isPixelStage():Bool
@@ -174,7 +173,8 @@ class PlayState extends MusicBeatState
 	public var health:Float = 1;
 	public var combo:Int = 0;
 
-	public var healthBar:Bar;
+	private var healthBarBG:FlxSprite;
+	public var healthBar:FlxBar;
 	public var timeBar:Bar;
 	var songPercent:Float = 0;
 
@@ -502,7 +502,7 @@ class PlayState extends MusicBeatState
 		if(ClientPrefs.data.downScroll) timeTxt.y = FlxG.height - 44;
 		if(ClientPrefs.data.timeBarType == 'Song Name') timeTxt.text = SONG.song;
 
-		timeBar = new Bar(0, timeTxt.y + (timeTxt.height / 4), 'timeBar', function() return songPercent, 0, 1);
+		timeBar = new Bar(0, timeTxt.y + (timeTxt.height / 4), 'healthBar', function() return songPercent, 0, 1);
 		timeBar.scrollFactor.set();
 		timeBar.screenCenter(X);
 		timeBar.alpha = 0;
@@ -540,26 +540,31 @@ class PlayState extends MusicBeatState
 		FlxG.worldBounds.set(0, 0, FlxG.width, FlxG.height);
 		moveCameraSection();
 
-		healthBar = new Bar(0, FlxG.height * (!ClientPrefs.data.downScroll ? 0.89 : 0.11), 'healthBar', function() return health, 0, 2);
-		healthBar.screenCenter(X);
-		healthBar.leftToRight = false;
+		healthBarBG = new FlxSprite(0, FlxG.height * (!ClientPrefs.data.downScroll ? 0.89 : 0.11)).loadGraphic(Paths.image('healthBar'));
+		healthBarBG.screenCenter(X);
+		healthBarBG.visible = !ClientPrefs.data.hideHud;
+		healthBarBG.alpha = ClientPrefs.data.healthBarAlpha;
+  		healthBarBG.scrollFactor.set();
+  		uiGroup.add(healthBarBG);
+
+		healthBar = new FlxBar(healthBarBG.x + 4, healthBarBG.y + 4, RIGHT_TO_LEFT, Std.int(healthBarBG.width - 8), Std.int(healthBarBG.height - 8), this, 'health', 0, 2);
 		healthBar.scrollFactor.set();
 		healthBar.visible = !ClientPrefs.data.hideHud;
 		healthBar.alpha = ClientPrefs.data.healthBarAlpha;
 		if(ClientPrefs.data.legacyColors)
-			healthBar.setColors(0xFFFF0000, 0xFF66FF33);
+			healthBar.createFilledBar(0xFFFF0000, 0xFF66FF33);
 		else
 			reloadHealthBarColors();
 		uiGroup.add(healthBar);
 
 		iconP1 = new HealthIcon(boyfriend.healthIcon, true);
-		iconP1.y = healthBar.y - 71;
+		iconP1.y = healthBar.y - (iconP1.height / 2);
 		iconP1.visible = !ClientPrefs.data.hideHud;
 		iconP1.alpha = ClientPrefs.data.healthBarAlpha;
 		uiGroup.add(iconP1);
 
 		iconP2 = new HealthIcon(dad.healthIcon, false);
-		iconP2.y = healthBar.y - 71;
+		iconP2.y = healthBar.y - (iconP2.height / 2);
 		iconP2.visible = !ClientPrefs.data.hideHud;
 		iconP2.alpha = ClientPrefs.data.healthBarAlpha;
 		uiGroup.add(iconP2);
@@ -568,7 +573,7 @@ class PlayState extends MusicBeatState
 		if(isPixelStage) starSuffix = '-pixel';
 		if(isPixelStage) starSoundsSuffix = '-pixel';
 
-		starBarBase = new FlxSprite(0, healthBar.y - 100).makeGraphic(Std.int(FlxG.width * 0.1), 3, FlxColor.WHITE);
+		starBarBase = new FlxSprite(0, healthBarBG.y - 100).makeGraphic(Std.int(FlxG.width * 0.1), 3, FlxColor.WHITE);
 		starBarBase.scrollFactor.set();
 		starBarBase.visible = !ClientPrefs.data.hideHud;
 		uiGroup.add(starBarBase);
@@ -663,7 +668,7 @@ class PlayState extends MusicBeatState
 			star5.y = starBarBase.y - 312;
 		}
 
-		scoreTxt = new FlxText(0, healthBar.y + 40, FlxG.width, "", 20);
+		scoreTxt = new FlxText(0, healthBarBG.y + 40, FlxG.width, "", 20);
 		scoreTxt.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		scoreTxt.scrollFactor.set();
 		scoreTxt.borderSize = 1.25;
@@ -673,7 +678,7 @@ class PlayState extends MusicBeatState
 		if (cpuControlled)
 			scoreTxt.visible = false;
 
-		songNameWatermark = new FlxText(4, healthBar.y + 50, 0, SONG.song + " - " + Difficulty.getString(), 16);
+		songNameWatermark = new FlxText(4, healthBarBG.y + 50, 0, SONG.song + " - " + Difficulty.getString(), 16);
 		songNameWatermark.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		songNameWatermark.scrollFactor.set();
 		songNameWatermark.visible = !ClientPrefs.data.hideHud;
@@ -681,7 +686,7 @@ class PlayState extends MusicBeatState
 		if(ClientPrefs.data.downScroll)
 			songNameWatermark.y = FlxG.height * 0.9 + 45;
 
-		shadowEngineWatermark = new FlxText(20, healthBar.y + 50, 0, (Main.watermarks ? "hadow Engine v" + MainMenuState.shadowEngineVersion : ""), 16);
+		shadowEngineWatermark = new FlxText(20, healthBarBG.y + 50, 0, (Main.watermarks ? "hadow Engine v" + MainMenuState.shadowEngineVersion : ""), 16);
 		shadowEngineWatermark.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		shadowEngineWatermark.scrollFactor.set();
 		shadowEngineWatermark.visible = !ClientPrefs.data.hideHud;
@@ -714,8 +719,6 @@ class PlayState extends MusicBeatState
 		// have to put this cuz apparently the shit doesn't reset when playing a different song without the script
 		flipHud = false;
 		showOnlyStrums = false;
-		playerStrumsVisible = true;
-		opponentStrumsVisible = true;
 
 		startingSong = true;
 
@@ -760,7 +763,7 @@ class PlayState extends MusicBeatState
 
 		var playin:String = SONG.song + " - " + Difficulty.getString();
 		
-		Application.current.window.title = "Friday Night Funkin': Shadow Engine" + ' | ' + playin;
+		Application.current.window.title = Main.appName + ' | ' + playin;
 
 		startCallback();
 		RecalculateRating();
@@ -792,7 +795,7 @@ class PlayState extends MusicBeatState
 
 		cacheCountdown();
 		cachePopUpScore();
-		flipStrums();
+		if(flipHud) flipStrums();
 
 		if(eventNotes.length < 1) checkEventNote();
 	}
@@ -882,8 +885,10 @@ class PlayState extends MusicBeatState
 	#end
 
 	public function reloadHealthBarColors() {
-		healthBar.setColors(FlxColor.fromRGB(dad.healthColorArray[0], dad.healthColorArray[1], dad.healthColorArray[2]),
+		healthBar.createFilledBar(FlxColor.fromRGB(dad.healthColorArray[0], dad.healthColorArray[1], dad.healthColorArray[2]),
 			FlxColor.fromRGB(boyfriend.healthColorArray[0], boyfriend.healthColorArray[1], boyfriend.healthColorArray[2]));
+
+		healthBar.updateBar();
 	}
 
 	public function reloadStarBarColors() {
@@ -1719,18 +1724,17 @@ class PlayState extends MusicBeatState
 
 	function flipStrums()
 	{
+		if (strumLineNotes == null || strumLineNotes.members == null) return;
+		
 		for (i in 0...4)
 		{
 			var playerStrum = strumLineNotes.members[i];
 			var opponentStrum = strumLineNotes.members[i + 4];
-			var tempX = playerStrum.x;
 			if (playerStrum != null && opponentStrum != null)
 			{		
-				if (flipHud)
-				{
-					playerStrum.x = opponentStrum.x;
-					opponentStrum.x = tempX;
-				}
+				var tempX = playerStrum.x;
+				playerStrum.x = opponentStrum.x;
+				opponentStrum.x = tempX;
 			}
 		}
 	}
@@ -1870,9 +1874,6 @@ class PlayState extends MusicBeatState
 				openCharacterEditor();
 		}
 
-		if (healthBar.bounds.max != null && health > healthBar.bounds.max)
-			health = healthBar.bounds.max;
-
 		// handling all the Shadow Engine functions here cuz yes
 		if (flipHud)
 		{
@@ -1922,19 +1923,6 @@ class PlayState extends MusicBeatState
 			songNameWatermark.visible = !ClientPrefs.data.hideHud;
 			shadowEngineWatermark.visible = !ClientPrefs.data.hideHud;
 			shadowEngineLogo.visible = !ClientPrefs.data.hideHud;
-		}
-
-		for (i in 0...4)
-		{
-			if (!playerStrumsVisible)
-				playerStrums.members[i].visible = false;
-			else
-				playerStrums.members[i].visible = true;
-
-			if (!opponentStrumsVisible)
-				opponentStrums.members[i].visible = false;
-			else
-				opponentStrums.members[i].visible = ClientPrefs.data.opponentStrums;
 		}
 
 		updateIconsScale(elapsed);
@@ -2197,12 +2185,12 @@ class PlayState extends MusicBeatState
 	public dynamic function updateIconsPosition()
 	{
 		var iconOffset:Int = 26;
-		var iconOffset2:Int = 98;
+		var iconOffset2:Int = 567;
 
 		if(flipHud) {
-			iconOffset = 627;
+			iconOffset = 619;
 			iconP1.x = healthBar.x - (healthBar.width * (FlxMath.remapToRange(healthBar.percent, 0, 100, 100, 0) * 0.01)) - (iconP1.width - iconOffset);
-			iconP2.x = healthBar.x - (healthBar.width * (FlxMath.remapToRange(healthBar.percent, 0, 100, 100, 0) * 0.01)) - (iconP1.width - (iconOffset + iconOffset2));
+			iconP2.x = healthBar.x - (healthBar.width * (FlxMath.remapToRange(healthBar.percent, 0, 100, 100, 0) * 0.01) - iconOffset2);
 		}
 		else {
 			iconP1.x = healthBar.x + (healthBar.width * (FlxMath.remapToRange(healthBar.percent, 0, 100, 100, 0) * 0.01) - iconOffset);
@@ -2258,7 +2246,7 @@ class PlayState extends MusicBeatState
 		DiscordClient.resetClientID();
 		#end
 
-		Application.current.window.title = "Friday Night Funkin': Shadow Engine";
+		Application.current.window.title = Main.appName;
 		MusicBeatState.switchState(new ChartingState());
 	}
 
@@ -2759,7 +2747,7 @@ class PlayState extends MusicBeatState
 					#if DISCORD_ALLOWED DiscordClient.resetClientID(); #end
 
 					canResync = false;
-					Application.current.window.title = "Friday Night Funkin': Shadow Engine";
+					Application.current.window.title = Main.appName;
 					MusicBeatState.switchState(new StoryMenuState());
 
 					// if ()
@@ -2799,7 +2787,7 @@ class PlayState extends MusicBeatState
 				#if DISCORD_ALLOWED DiscordClient.resetClientID(); #end
 
 				canResync = false;
-				Application.current.window.title = "Friday Night Funkin': Shadow Engine";
+				Application.current.window.title = Main.appName;
 				MusicBeatState.switchState(new FreeplayState());
 				changedDifficulty = false;
 			}

@@ -2280,9 +2280,9 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 			}
 
 			if(mustHitSection)
-				mustHitIndicator.x = iconP1.x + iconP1.width/2;
+				mustHitIndicator.x = iconP1.x + (iconP1.width/2) - 52.5;
 			else
-				mustHitIndicator.x = iconP2.x + iconP2.width/2;
+				mustHitIndicator.x = iconP2.x + (iconP2.width/2) - 52.5;
 		}
 		_lastGfSection = isGfSection;
 		_lastSec = curSec;

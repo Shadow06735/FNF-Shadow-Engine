@@ -35,7 +35,7 @@ class PauseSubState extends MusicBeatSubstate
 	{
 		var paused:String = PlayState.SONG.song + " - " + Difficulty.getString() + " [Paused]";
 		
-		Application.current.window.title = "Friday Night Funkin': Shadow Engine" + ' | ' + paused;
+		Application.current.window.title = Main.appName + ' | ' + paused;
 
 		if(Difficulty.list.length < 2) menuItemsOG.remove('Change Difficulty'); //No need to change difficulty if there is only one!
 
@@ -237,6 +237,7 @@ class PauseSubState extends MusicBeatSubstate
 						Song.loadFromJson(poop, songLowercase);
 						PlayState.storyDifficulty = curSelected;
 						MusicBeatState.resetState();
+						Application.current.window.title = Main.appName;
 						FlxG.sound.music.volume = 0;
 						PlayState.changedDifficulty = true;
 						PlayState.chartingMode = false;
@@ -272,7 +273,7 @@ class PauseSubState extends MusicBeatSubstate
 					close();
 					var playin:String = PlayState.SONG.song + " - " + Difficulty.getString();
 
-					Application.current.window.title = "Friday Night Funkin': Shadow Engine" + ' | ' + playin;
+					Application.current.window.title = Main.appName + ' | ' + playin;
 				case 'Change Difficulty':
 					menuItems = difficultyChoices;
 					deleteSkipTimeText();
@@ -283,10 +284,10 @@ class PauseSubState extends MusicBeatSubstate
 					practiceText.visible = PlayState.instance.practiceMode;
 				case "Restart Song":
 					restartSong();
-					Application.current.window.title = "Friday Night Funkin': Shadow Engine";
+					Application.current.window.title = Main.appName;
 				case "Leave Charting Mode":
 					restartSong();
-					Application.current.window.title = "Friday Night Funkin': Shadow Engine";
+					Application.current.window.title = Main.appName;
 					PlayState.chartingMode = false;
 				case 'Skip Time':
 					if(curTime < Conductor.songPosition)
@@ -304,14 +305,14 @@ class PauseSubState extends MusicBeatSubstate
 						close();
 						var playin:String = PlayState.SONG.song + " - " + Difficulty.getString();
 						
-						Application.current.window.title = "Friday Night Funkin': Shadow Engine" + ' | ' + playin;
+						Application.current.window.title = Main.appName + ' | ' + playin;
 					}
 				case 'End Song':
 					close();
 					PlayState.instance.notes.clear();
 					PlayState.instance.unspawnNotes = [];
 					PlayState.instance.finishSong(true);
-					Application.current.window.title = "Friday Night Funkin': Shadow Engine";
+					Application.current.window.title = Main.appName;
 				case 'Toggle Botplay':
 					PlayState.instance.cpuControlled = !PlayState.instance.cpuControlled;
 					PlayState.changedDifficulty = true;
@@ -323,7 +324,7 @@ class PauseSubState extends MusicBeatSubstate
 					PlayState.instance.vocals.volume = 0;
 					PlayState.instance.canResync = false;
 					MusicBeatState.switchState(new OptionsState());
-					Application.current.window.title = "Friday Night Funkin': Shadow Engine";
+					Application.current.window.title = Main.appName;
 					if(ClientPrefs.data.pauseMusic != 'None')
 					{
 						FlxG.sound.playMusic(Paths.music(Paths.formatToSongPath(ClientPrefs.data.pauseMusic)), pauseMusic.volume);
@@ -345,7 +346,7 @@ class PauseSubState extends MusicBeatSubstate
 						MusicBeatState.switchState(new FreeplayState());
 					}
 
-					Application.current.window.title = "Friday Night Funkin': Shadow Engine";
+					Application.current.window.title = Main.appName;
 					PlayState.changedDifficulty = false;
 					PlayState.chartingMode = false;
 					FlxG.camera.followLerp = 0;

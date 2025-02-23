@@ -714,14 +714,6 @@ class FunkinLua {
 			PlayState.showOnlyStrums = showOnlyStrums;
 		});
 
-		Lua_helper.add_callback(lua, "playerStrumsVisible", function(playerStrumsVisible:Bool = true) {
-			PlayState.playerStrumsVisible = playerStrumsVisible;
-		});
-
-		Lua_helper.add_callback(lua, "opponentStrumsVisible", function(opponentStrumsVisible:Bool = true) {
-			PlayState.opponentStrumsVisible = opponentStrumsVisible;
-		});
-
 		// precaching
 		Lua_helper.add_callback(lua, "addCharacterToList", function(name:String, type:String) {
 			var charType:Int = 0;
@@ -1149,7 +1141,9 @@ class FunkinLua {
 				left_color = CoolUtil.colorFromString(left);
 			if (right != null && right != '')
 				right_color = CoolUtil.colorFromString(right);
-			game.healthBar.setColors(left_color, right_color);
+			
+			PlayState.instance.healthBar.createFilledBar(left_color, right_color);
+			PlayState.instance.healthBar.updateBar();
 		});
 		Lua_helper.add_callback(lua, "setTimeBarColors", function(left:String, right:String) {
 			var left_color:Null<FlxColor> = null;

@@ -87,7 +87,9 @@ It depends on your operating system. For Windows, run `windows.bat`, for anythin
 
 Sit back, relax, and wait for haxelib to do its magic. You will be done when you see the word "**Finished!**"
 
-To build the game, run `lime test cpp`.
+Due to a recent change with the healthbar, make sure that you install flixel-ui as well by running `haxelib install flixel-ui`.
+
+Once everything is installed, run `lime test cpp` to build the game.
 
 ---
 
