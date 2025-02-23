@@ -36,7 +36,7 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 	var cameraZoomText:FlxText;
 	var frameAdvanceText:FlxText;
 
-	var healthBar:Bar;
+	var healthBarBG:FlxSprite;
 	var healthIcon:HealthIcon;
 
 	var copiedOffset:Array<Float> = [0, 0];
@@ -113,16 +113,16 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 		cameraFollowPointer.setGraphicSize(40, 40);
 		cameraFollowPointer.updateHitbox();
 
-		healthBar = new Bar(30, FlxG.height - 75);
-		healthBar.scrollFactor.set();
-		healthBar.cameras = [camHUD];
+		healthBarBG = new FlxSprite(30, FlxG.height - 75).loadGraphic(Paths.image('healthBar'));
+		healthBarBG.scrollFactor.set();
+		healthBarBG.cameras = [camHUD];
 
 		healthIcon = new HealthIcon(character.healthIcon, false, false);
-		healthIcon.y = healthBar.y - 71;
+		healthIcon.y = healthBarBG.y - 71;
 		healthIcon.cameras = [camHUD];
 
 		add(cameraFollowPointer);
-		add(healthBar);
+		add(healthBarBG);
 		add(healthIcon);
 		add(animsTxt);
 
@@ -242,7 +242,7 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 		else add(character);
 		updateCharacterPositions();
 		reloadAnimList();
-		if(healthBar != null && healthIcon != null) updateHealthBar();
+		if(healthBarBG != null && healthIcon != null) updateHealthBar();
 	}
 
 	function makeUIMenu()
@@ -1138,7 +1138,7 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 		healthColorStepperR.value = character.healthColorArray[0];
 		healthColorStepperG.value = character.healthColorArray[1];
 		healthColorStepperB.value = character.healthColorArray[2];
-		healthBar.leftBar.color = healthBar.rightBar.color = FlxColor.fromRGB(character.healthColorArray[0], character.healthColorArray[1], character.healthColorArray[2]);
+		healthBarBG.color = FlxColor.fromRGB(character.healthColorArray[0], character.healthColorArray[1], character.healthColorArray[2]);
 		healthIcon.changeIcon(character.healthIcon, false);
 		updatePresence();
 	}
