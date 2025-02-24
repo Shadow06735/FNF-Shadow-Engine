@@ -5,6 +5,7 @@ import flixel.graphics.frames.FlxAtlasFrames;
 
 import flixel.system.debug.interaction.tools.Pointer.GraphicCursorCross;
 import flixel.util.FlxDestroyUtil;
+import flixel.ui.FlxBar;
 
 import openfl.net.FileReference;
 import openfl.events.Event;
@@ -37,6 +38,7 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 	var frameAdvanceText:FlxText;
 
 	var healthBarBG:FlxSprite;
+	var healthBar:FlxBar;
 	var healthIcon:HealthIcon;
 
 	var copiedOffset:Array<Float> = [0, 0];
@@ -117,12 +119,17 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 		healthBarBG.scrollFactor.set();
 		healthBarBG.cameras = [camHUD];
 
+		healthBar = new FlxBar(healthBarBG.x + 4, healthBarBG.y + 4, RIGHT_TO_LEFT, Std.int(healthBarBG.width - 8), Std.int(healthBarBG.height - 8));
+		healthBar.scrollFactor.set();
+		healthBar.cameras = [camHUD];
+
 		healthIcon = new HealthIcon(character.healthIcon, false, false);
-		healthIcon.y = healthBarBG.y - 71;
+		healthIcon.y = healthBar.y - (healthIcon.height / 2);
 		healthIcon.cameras = [camHUD];
 
 		add(cameraFollowPointer);
 		add(healthBarBG);
+		add(healthBar);
 		add(healthIcon);
 		add(animsTxt);
 
@@ -242,7 +249,7 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 		else add(character);
 		updateCharacterPositions();
 		reloadAnimList();
-		if(healthBarBG != null && healthIcon != null) updateHealthBar();
+		if(healthBarBG != null && healthBar != null && healthIcon != null) updateHealthBar();
 	}
 
 	function makeUIMenu()
@@ -1138,7 +1145,8 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 		healthColorStepperR.value = character.healthColorArray[0];
 		healthColorStepperG.value = character.healthColorArray[1];
 		healthColorStepperB.value = character.healthColorArray[2];
-		healthBarBG.color = FlxColor.fromRGB(character.healthColorArray[0], character.healthColorArray[1], character.healthColorArray[2]);
+		healthBar.createFilledBar(FlxColor.fromRGB(character.healthColorArray[0], character.healthColorArray[1], character.healthColorArray[2]),
+			FlxColor.fromRGB(character.healthColorArray[0], character.healthColorArray[1], character.healthColorArray[2]));
 		healthIcon.changeIcon(character.healthIcon, false);
 		updatePresence();
 	}

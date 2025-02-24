@@ -1890,6 +1890,7 @@ class PlayState extends MusicBeatState
 
 		if (showOnlyStrums)
 		{
+			healthBarBG.visible = false;
 			healthBar.visible = false;
 			iconP1.visible = false;
 			iconP2.visible = false;
@@ -1908,6 +1909,7 @@ class PlayState extends MusicBeatState
 		}
 		else
 		{
+			healthBarBG.visible = !ClientPrefs.data.hideHud;
 			healthBar.visible = !ClientPrefs.data.hideHud;
 			iconP1.visible = !ClientPrefs.data.hideHud;
 			iconP2.visible = !ClientPrefs.data.hideHud;
